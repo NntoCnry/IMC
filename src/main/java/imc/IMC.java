@@ -14,76 +14,75 @@ import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 
 public class IMC extends Application {
-	//creas las variables que vas a usar
-	private TextField pesoTextField, alturaTextField;
-	private Label pesoLabel,kiloLabel,alturaLabel,centrimetroLabel,clasificacionLabel,estadoLabel;
-	private SimpleDoubleProperty pesoSimpleDoubleProperty,alturaSimpleDoubleProperty;
-	
-	
-	public void start(Stage primaryStage) throws Exception {
-		pesoTextField= new TextField();
-		alturaTextField= new TextField();
-		pesoLabel= new Label("  Peso: ");
-		kiloLabel= new Label(" kg");
-		alturaLabel= new Label("Altura: ");
-		centrimetroLabel= new Label(" cm");
-		clasificacionLabel= new Label(" IMC: (peso * altura^2)");
-		estadoLabel=new Label("Bajo peso | Normal | Sobrepeso | Obeso ");
 
-		HBox pesoHBox=new HBox();
-		pesoHBox.setSpacing(5);
-		pesoHBox.getChildren().addAll(pesoLabel,pesoTextField,kiloLabel);
+	public void start(Stage primaryStage) throws Exception {
+		Label pesoLabel = new Label("  Peso: ");
+
+		TextField pesoTextField = new TextField();
 		
-		HBox alturaHBox=new HBox();
-		alturaHBox.getChildren().addAll(alturaLabel,alturaTextField,centrimetroLabel);
-		alturaHBox.setSpacing(5);
+		Label klLabel = new Label(" kg");
 		
+		Label altLabel = new Label("Altura: ");
+
+		TextField altTextField = new TextField();
+
+		Label cmLabel = new Label(" cm");
+
+		Label valorLabel = new Label(" IMC:");
+
+		Label statusLabel = new Label("Bajo peso | Normal | Sobrepeso | Obeso ");
+
+		HBox pesoHBox = new HBox();
+		pesoHBox.setSpacing(10);
+		pesoHBox.getChildren().addAll(pesoLabel, pesoTextField, klLabel);
+
+		HBox altHBox = new HBox();
+		altHBox.setSpacing(10);
+		altHBox.getChildren().addAll(altLabel, altTextField, cmLabel);
+
 		VBox root = new VBox();
-		root.setSpacing(5);
-		root.setFillWidth(false); 
-		root.setAlignment(Pos.CENTER); 
-		root.getChildren().addAll(pesoHBox,alturaHBox,clasificacionLabel,estadoLabel);
-		
-		//y crear la scena que contiene la ventana
+		root.setSpacing(10);
+		root.setFillWidth(false);
+		root.setAlignment(Pos.CENTER);
+		root.getChildren().addAll(pesoHBox, altHBox, valorLabel, statusLabel);
+
 		Scene escena = new Scene(root, 320, 200);
+		
 		primaryStage.setScene(escena);
 		primaryStage.setTitle("IMC.fxml");
 		primaryStage.show();
+
+		SimpleDoubleProperty pesoProperty = new SimpleDoubleProperty();
+		Bindings.bindBidirectional(pesoTextField.textProperty(), pesoProperty, new NumberStringConverter());
+
+		SimpleDoubleProperty altProperty = new SimpleDoubleProperty();
+		Bindings.bindBidirectional(altTextField.textProperty(), altProperty, new NumberStringConverter());
+		DoubleBinding operacion=pesoProperty.divide((altProperty.divide(100)).multiply((altProperty.divide(100))));		
+	
 		
-		pesoSimpleDoubleProperty = new SimpleDoubleProperty();
-		Bindings.bindBidirectional(pesoTextField.textProperty(), pesoSimpleDoubleProperty, new NumberStringConverter());
+		SimpleDoubleProperty resultOp = new SimpleDoubleProperty();
+		resultOp.bind(operacion);
 		
-		alturaSimpleDoubleProperty = new SimpleDoubleProperty();
-		Bindings.bindBidirectional(alturaTextField.textProperty(), alturaSimpleDoubleProperty, new NumberStringConverter());
-		
-		DoubleBinding operacionDoubleBindings=alturaSimpleDoubleProperty.divide(100);
-		operacionDoubleBindings=pesoSimpleDoubleProperty.divide(operacionDoubleBindings.multiply(operacionDoubleBindings));
-		
-		SimpleDoubleProperty resultado;
-		resultado = new SimpleDoubleProperty();
-		resultado.bind(operacionDoubleBindings);
-		//clasificacionLabel.textProperty().bind(Bindings.concat());
-		
-		clasificacionLabel.textProperty().bind(Bindings.concat("IMC: ")
-				.concat(Bindings.when(alturaSimpleDoubleProperty.isEqualTo(0)).then("(peso * altura^2)").otherwise(resultado.asString("%.2f"))));
-		
-		resultado.addListener((o, ov, nv)->{
-			double valorIMC=nv.doubleValue();
-			if(valorIMC < 18.5) {
-				estadoLabel.setText("Bajo peso");
-			}else if(valorIMC >=18.5 && valorIMC < 25) {
-				estadoLabel.setText("Normal");
-			}else if(valorIMC >=25 && valorIMC < 30) {
-				estadoLabel.setText("Sobrepeso");
-			}else {
-				estadoLabel.setText("Obeso");
-			}
+
+		valorLabel.textProperty().bind(Bindings.concat("IMC: ").concat(Bindings.when(altProperty.isEqualTo(0)).then(" ").otherwise(resultOp.asString("%.2f"))));
+
+		resultOp.addListener((o, ov, nv) -> {
+			double imc = nv.doubleValue();
+			if (imc < 18.5)
+				statusLabel.setText("Bajo peso");
+			else if (imc >= 18.5 && imc < 25)
+				statusLabel.setText("Normal");
+			else if (imc >= 25 && imc < 30)
+				statusLabel.setText("Sobrepeso");
+			else
+				statusLabel.setText("Obeso");
 		});
-		
+
 	}
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-launch(args);
+		launch(args);
 	}
 
 }
