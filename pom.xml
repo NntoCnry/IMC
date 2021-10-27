@@ -6,7 +6,7 @@
   <properties>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
-		<mainClass>com.imc.Main</mainClass>
+		<mainClass>imc.Main</mainClass>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
